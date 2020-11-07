@@ -4,20 +4,45 @@
 
     <application
             android:allowBackup="true"
+            android:fullBackupContent="false"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity
-                android:name=".ui.login.LoginActivity"
+                android:name=".TrolleyService"
                 android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity android:name=".ui.activities.main_view.MainViewActivity"
+                  android:label="@string/mainview_activity">
+        </activity>
+
+        <activity android:name=".ui.activities.login.LoginActivity"
+                  android:label="@string/login_activity">
+        </activity>
+
+        <activity android:name=".ui.activities.new_user.NewUserActivity"
+                  android:label="@string/new_user_activity">
+        </activity>
+
+        <activity
+                android:name=".ui.activities.gig.GigActivity"
+                android:label="@string/gig"
+                android:parentActivityName="com.grigorij.trolleyservice.ui.activities.main_view.MainViewActivity" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".ui.activities.main_view.MainViewActivity" />
+        </activity>
+
+
     </application>
 
 </manifest>

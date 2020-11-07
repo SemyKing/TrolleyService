@@ -1,12 +1,28 @@
 <resources>
     <string name="app_name">TrolleyService</string>
+    <string name="mainview_activity">MainView</string>
+    <string name="login_activity">Login</string>
+    <string name="new_user_activity">New User</string>
     <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
+    <string name="prompt_welcome">Welcome to Trolley Service App!</string>
+    <string name="prompt_create_user">Please create username and password</string>
+    <string name="prompt_sign_in">Please Sign In to continue</string>
+    <string name="username">Username</string>
+    <string name="name">Name</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_save">Save</string>
+
     <string name="welcome">"Welcome !"</string>
+    <string name="username_required">Username is required</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
+    <string name="password_required">Password is required</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="exit_double_click">Press back again to exit</string>
+    <string name="bad_credentials">Username or password is incorrect!</string>
+    <string name="gig">Gig</string>
+    <string name="placeholder_gig_date">Created: 30.12.2020 23:23</string>
+    <string name="placeholder_date_short">23.12.20</string>
 </resources>
