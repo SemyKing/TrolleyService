@@ -1,98 +1,106 @@
 package com.grigorij.trolleyservice.ui.activities.main_view;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.*;
-import androidx.annotation.LayoutRes;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NavUtils;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.grigorij.trolleyservice.R;
+import com.grigorij.trolleyservice.data.StaticValues;
 import com.grigorij.trolleyservice.data.database.AppDatabase;
-import com.grigorij.trolleyservice.data.model.Gig;
-import com.grigorij.trolleyservice.data.model.User;
-import com.grigorij.trolleyservice.ui.activities.gig.GigActivity;
-import org.w3c.dom.ls.LSOutput;
+import com.grigorij.trolleyservice.ui.activities.user.UserProfileActivity;
+import com.grigorij.trolleyservice.ui.fragments.GigListFragment;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.Objects;
 
-public class MainViewActivity extends Activity {
+public class MainViewActivity extends AppCompatActivity {
 
 	private AppDatabase appDatabase;
+	private ActionBar actionBar;
 	private boolean doubleBackToExitPressedOnce = false;
-	private List<Gig> gigList;
-	private GigArrayAdapter gigArrayAdapter;
-	private ListView gigListView;
+	private int currentBottomNavigationItem = -1;
 
-	private boolean activity_created = false;
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater menuInflater = getMenuInflater();
+		menuInflater.inflate(R.menu.actionbar_main_view_menu, menu);
+		return true;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main_view);
+
+		actionBar = getSupportActionBar();
+
+		Objects.requireNonNull(getSupportActionBar()).setTitle("");
+
 		appDatabase = AppDatabase.getInstance(this);
 
-		final TextView current_user = findViewById(R.id.current_user);
-		gigListView = findViewById(R.id.gig_list_view);
-
-		final FloatingActionButton newGigFab = findViewById(R.id.new_gig_fab);
-		newGigFab.setOnClickListener(new View.OnClickListener() {
+		BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+		bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 			@Override
-			public void onClick(View view) {
-				launchGigActivity(null);
+			public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+				switch (item.getItemId()) {
+					case R.id.gig_list:
+						if (currentBottomNavigationItem != R.id.gig_list) {
+							setTitle(getString(R.string.gigs));
+							actionBar.setTitle(getString(R.string.gigs));
+							loadFragment(new GigListFragment());
+						}
+						break;
+					case R.id.invoices_list:
+						if (currentBottomNavigationItem != R.id.invoices_list) {
+							setTitle(getString(R.string.invoices));
+							actionBar.setTitle(getString(R.string.invoices));
+//							loadFragment(new InvoicesListFragment());
+						}
+						break;
+				}
+				currentBottomNavigationItem = item.getItemId();
+				return true;
 			}
 		});
 
-		new Thread(new Runnable() {
-			@Override public void run() {
-				gigList = appDatabase.gigDao().getGigList();
-				final User currentUser = appDatabase.userDao().getUserList().get(0);
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			boolean newUserInitialization;
+			newUserInitialization = extras.getBoolean(StaticValues.NEW_USER_INITIALIZATION);
 
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						current_user.setText(currentUser.getUsername());
-					}
-				});
-
-				setupListView();
+			if (newUserInitialization) {
+				launchUserInfoActivity(true);
 			}
-		}).start();
-	}
-
-	private void setupListView() {
-		gigArrayAdapter = new GigArrayAdapter(this, gigList);
-		gigListView.setAdapter(gigArrayAdapter);
-		gigListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-				final Gig item = (Gig) parent.getItemAtPosition(position);
-
-				launchGigActivity(item);
-			}
-		});
-	}
-
-	private void launchGigActivity(Gig gig) {
-		Intent intent = new Intent(this, GigActivity.class);
-
-		if (gig != null) {
-			intent.putExtra("gig_id", gig.getId());
 		}
+
+		View view = bottomNavigationView.findViewById(R.id.gig_list);
+		view.performClick();
+	}
+
+	private void launchUserInfoActivity(boolean isNewUser) {
+		Intent intent = new Intent(this, UserProfileActivity.class);
+		intent.putExtra(StaticValues.NEW_USER_INITIALIZATION, isNewUser);
 
 		startActivity(intent);
 	}
 
+	private void loadFragment(Fragment fragment) {
+		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+		transaction.replace(R.id.fragment_frame, fragment);
+		transaction.addToBackStack(null);
+		transaction.commit();
+	}
 
 	@Override
 	public void onBackPressed() {
@@ -114,57 +122,10 @@ public class MainViewActivity extends Activity {
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-
-		if (gigList != null) {
-			new Thread(new Runnable() {
-				@Override public void run() {
-
-					gigList.clear();
-					gigList.addAll(appDatabase.gigDao().getGigList());
-
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							gigArrayAdapter.notifyDataSetChanged();
-						}
-					});
-				}
-			}).start();
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.action_profile) {
+			launchUserInfoActivity(false);
 		}
-	}
-
-
-	private static class GigArrayAdapter extends ArrayAdapter<Gig> {
-
-		private Context mContext;
-		private List<Gig> gigList;
-
-		public GigArrayAdapter(@NonNull Context context, @LayoutRes List<Gig> list) {
-			super(context, 0, list);
-			mContext = context;
-			gigList = list;
-		}
-
-
-		@NonNull
-		@Override
-		public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-			View listItem = convertView;
-			if(listItem == null)
-				listItem = LayoutInflater.from(mContext).inflate(R.layout.gig_list_item,parent,false);
-
-			Gig gig = gigList.get(position);
-
-			TextView gigName = listItem.findViewById(R.id.gig_list_name);
-			gigName.setText(gig.getName());
-
-			TextView gigDate = listItem.findViewById(R.id.gig_list_date);
-			SimpleDateFormat df = new SimpleDateFormat("dd.MM.yy", Locale.getDefault());
-			gigDate.setText(df.format(gig.getDate()));
-
-			return listItem;
-		}
+		return super.onOptionsItemSelected(item);
 	}
 }

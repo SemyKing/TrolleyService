@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.grigorij.trolleyservice.data.database.AppDatabase;
 import com.grigorij.trolleyservice.data.model.User;
 import com.grigorij.trolleyservice.ui.activities.login.LoginActivity;
-import com.grigorij.trolleyservice.ui.activities.new_user.NewUserActivity;
+import com.grigorij.trolleyservice.ui.activities.user.NewUserActivity;
 
 import java.util.List;
 

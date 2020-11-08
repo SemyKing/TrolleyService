@@ -27,13 +27,24 @@
                   android:label="@string/login_activity">
         </activity>
 
-        <activity android:name=".ui.activities.new_user.NewUserActivity"
+        <activity android:name=".ui.activities.user.NewUserActivity"
                   android:label="@string/new_user_activity">
         </activity>
 
         <activity
-                android:name=".ui.activities.gig.GigActivity"
+                android:name=".ui.activities.gig.GigInfoActivity"
                 android:label="@string/gig"
+                android:parentActivityName="com.grigorij.trolleyservice.ui.activities.main_view.MainViewActivity" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".ui.activities.main_view.MainViewActivity" />
+        </activity>
+
+        <activity
+                android:name=".ui.activities.user.UserProfileActivity"
+                android:label="@string/profile"
                 android:parentActivityName="com.grigorij.trolleyservice.ui.activities.main_view.MainViewActivity" >
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
